@@ -2,101 +2,71 @@
 package main
 
 import (
-	"fmt"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"learning-go/src/Entity"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "learning-go/docs"
+	"learning-go/src/Controller"
 	"log"
-	"net/http"
 )
 
-func main() {
-
-	dsn := "root:root@tcp(127.0.0.1:4306)/go_base?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	var user Entity.User
-	var task Entity.Task
-
-	if err != nil {
-		fmt.Errorf("db errors: %w", err)
+// init is invoked before main()
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
 	}
-
-	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-
-		checkContentType(r)
-
-		switch r.Method {
-		case http.MethodPost:
-
-			user.CreateObj(w, r, db)
-			break
-		case http.MethodGet:
-			user.GetObjCollection(w, r, db)
-			break
-		}
-	})
-
-	http.HandleFunc("/users/", func(w http.ResponseWriter, r *http.Request) {
-		checkContentType(r)
-
-		switch r.Method {
-		case http.MethodPut:
-			user.UpdateObj(w, r, db)
-			break
-		case http.MethodGet:
-			user.GetObjItem(w, r, db)
-			break
-		}
-	})
-
-	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
-		checkContentType(r)
-
-		switch r.Method {
-		case http.MethodPost:
-			task.CreateObj(w, r, db)
-			break
-		case http.MethodGet:
-			task.GetObjCollection(w, r, db)
-			break
-		}
-	})
-
-	http.HandleFunc("/tasks/", func(w http.ResponseWriter, r *http.Request) {
-		checkContentType(r)
-
-		switch r.Method {
-		case http.MethodPost:
-			task.CreateObj(w, r, db)
-			break
-		case http.MethodPut:
-			task.UpdateObj(w, r, db)
-			break
-		case http.MethodGet:
-			task.GetObjItem(w, r, db)
-			break
-		}
-	})
-
-	http.HandleFunc("/users/:id/tasks", func(w http.ResponseWriter, r *http.Request) {
-		checkContentType(r)
-
-		switch r.Method {
-		case http.MethodGet:
-			//Entity.GetUserItem(w, r, db)
-			break
-		}
-	})
-
-	err = http.ListenAndServe(":9990", nil)
-
-	log.Fatal(err)
 }
 
-func checkContentType(r *http.Request) {
-	contentType := r.Header.Get("content-type")
+///@title TODOList API
+//@version 1.0
+//@description API Server for TodoList Application
 
-	if contentType != "application/json" {
-		fmt.Errorf("unsupported content-type: " + contentType)
+//@host localhost:8080
+//@BasePath /
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in header
+// @name Authorization
+func main() {
+	//вынести в init routes
+	router := gin.New()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	users := router.Group("/users")
+	{
+		users.POST("", Controller.CreateObjUser)
+		users.GET("/:id", Controller.GetObjItemUser)
+		users.GET("", Controller.GetObjCollectionUser)
+		users.PUT("/:id", Controller.UpdateObjUser)
 	}
+
+	tasks := router.Group("/tasks")
+	{
+		tasks.POST("", Controller.CreateObjTask)
+		tasks.GET("/:id", Controller.GetObjItemTask)
+		tasks.GET("", Controller.GetObjCollectionTask)
+		tasks.PUT("/:id", Controller.UpdateObjTask)
+	}
+
+	err := router.Run()
+	if err != nil {
+		return
+	}
+
+	//http.HandleFunc("/users/:id/tasks", func(w http.ResponseWriter, r *http.Request) {
+	//	checkContentType(r)
+	//
+	//	switch r.Method {
+	//	case http.MethodGet:
+	//		//Entity.GetUserItem(w, r, db)
+	//		break
+	//	}
+	//})
+
+	//err = http.ListenAndServe(":8080", nil)
+
+	//log.Fatal(err)
 }
