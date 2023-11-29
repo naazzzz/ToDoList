@@ -1,7 +1,6 @@
 package Controller
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"learning-go/src/Entity"
 	"learning-go/src/Service"
@@ -18,30 +17,22 @@ import (
 // @Router /users [post]
 func CreateObjUser(c *gin.Context) {
 	var user Entity.User
+	var tasks []Entity.Task
 
 	db := Service.CreateConnection()
 
-	err := json.NewDecoder(c.Request.Body).Decode(&user)
-
-	if err != nil {
-		http.Error(c.Writer, c.Errors.String(), http.StatusBadRequest)
-		return
-	}
-	//Вынести
-	err = db.AutoMigrate(user)
-
-	if err != nil {
-		http.Error(c.Writer, c.Errors.String(), http.StatusBadRequest)
+	if err := c.BindJSON(&user); err != nil {
+		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	db.Create(&user)
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(c.Writer).Encode(user)
-	if err != nil {
+	if err := db.Create(&user); err.Error != nil {
+		http.Error(c.Writer, err.Error.Error(), http.StatusBadRequest)
 		return
 	}
+	user.Tasks = tasks
+
+	c.JSON(200, &user)
 }
 
 // GetObjItemUser godoc
@@ -70,12 +61,7 @@ func GetObjItemUser(c *gin.Context) {
 	db.Model(Entity.Task{UserId: user.ID}).Find(&tasks)
 	user.Tasks = tasks
 
-	c.Writer.Header().Set("Content-Type", "application/json")
-
-	err = json.NewEncoder(c.Writer).Encode(user)
-	if err != nil {
-		return
-	}
+	c.JSON(200, &user)
 }
 
 // GetObjCollectionUser godoc
@@ -87,16 +73,17 @@ func GetObjItemUser(c *gin.Context) {
 // @Router /users [get]
 func GetObjCollectionUser(c *gin.Context) {
 	var users []Entity.User
+	var tasks []Entity.Task
 
 	db := Service.CreateConnection()
 	db.Model(&Entity.User{}).Find(&users)
 
-	c.Writer.Header().Set("Content-Type", "application/json")
-
-	err := json.NewEncoder(c.Writer).Encode(users)
-	if err != nil {
-		return
+	for index, element := range users {
+		db.Model(Entity.Task{}).Where("user_id = ?", element.ID).Find(&tasks)
+		users[index].Tasks = tasks
 	}
+
+	c.JSON(200, &users)
 }
 
 // UpdateObjUser godoc
@@ -106,6 +93,7 @@ func GetObjCollectionUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id   path      int  true  "User ID"
+// @Param input body Entity.UserDTO true "User info"
 // @Router /users/{id} [put]
 func UpdateObjUser(c *gin.Context) {
 	var user Entity.User
@@ -114,24 +102,19 @@ func UpdateObjUser(c *gin.Context) {
 
 	objId := c.Param("id")
 
-	err := json.NewDecoder(c.Request.Body).Decode(&user)
-	if err != nil {
+	if err := c.BindJSON(&user); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = db.Where("id = ?", objId).Updates(&user).Error
+	err := db.Where("id = ?", objId).Updates(&Entity.User{Username: user.Username, Password: user.Password}).Error
 
 	if err != nil {
 		http.NotFound(c.Writer, c.Request)
 		return
 	}
 
-	c.Writer.Header().Set("Content-Type", "application/json")
 	db.Model(&user).Where("id = ?", objId).Find(&user)
 
-	err = json.NewEncoder(c.Writer).Encode(user)
-	if err != nil {
-		return
-	}
+	c.JSON(200, &user)
 }

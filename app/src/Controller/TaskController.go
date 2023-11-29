@@ -28,20 +28,9 @@ func CreateObjTask(c *gin.Context) {
 		return
 	}
 
-	err = db.AutoMigrate(task)
-
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	db.Create(&task)
 
-	c.Writer.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(c.Writer).Encode(task)
-	if err != nil {
-		return
-	}
+	c.JSON(200, task)
 }
 
 // GetObjItemTask godoc
@@ -65,13 +54,7 @@ func GetObjItemTask(c *gin.Context) {
 		http.NotFound(c.Writer, c.Request)
 		return
 	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-
-	err = json.NewEncoder(c.Writer).Encode(task)
-	if err != nil {
-		return
-	}
-
+	c.JSON(200, task)
 }
 
 // GetObjCollectionTask godoc
@@ -88,11 +71,7 @@ func GetObjCollectionTask(c *gin.Context) {
 
 	db.Model(&tasks).Find(&tasks)
 
-	c.Writer.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(c.Writer).Encode(tasks)
-	if err != nil {
-		return
-	}
+	c.JSON(200, tasks)
 }
 
 // UpdateObjTask godoc
@@ -102,6 +81,7 @@ func GetObjCollectionTask(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id   path      int  true  "Task ID"
+// @Param input body Entity.TaskDTO true "Task info"
 // @Router /tasks/{id} [put]
 func UpdateObjTask(c *gin.Context) {
 	var task Entity.Task
@@ -122,11 +102,7 @@ func UpdateObjTask(c *gin.Context) {
 		return
 	}
 
-	c.Writer.Header().Set("Content-Type", "application/json")
 	db.Where("id = ?", objId).First(&task)
 
-	err = json.NewEncoder(c.Writer).Encode(task)
-	if err != nil {
-		return
-	}
+	c.JSON(200, task)
 }

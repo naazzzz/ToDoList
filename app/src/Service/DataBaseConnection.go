@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"learning-go/src/Entity"
 	"os"
 )
 
@@ -15,6 +16,9 @@ func CreateConnection() *gorm.DB {
 	if err != nil {
 		fmt.Errorf("db errors: %w", err)
 	}
+
+	err = db.AutoMigrate(Entity.User{})
+	err = db.AutoMigrate(Entity.Task{})
 
 	return db
 }

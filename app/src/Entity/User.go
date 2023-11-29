@@ -5,13 +5,13 @@ import (
 )
 
 type UserDTO struct {
-	Username string
-	Password string
+	Username string `json:"username" uri:"details" binding:"required"`
+	Password string `json:"password" uri:"details" binding:"required"`
 }
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"unique;not null"`
-	Password string `gorm:"not null"`
+	Username string `gorm:"unique;default:null"`
+	Password string `gorm:"default:null'"`
 	Tasks    []Task `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

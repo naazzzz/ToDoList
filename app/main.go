@@ -55,18 +55,4 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	//http.HandleFunc("/users/:id/tasks", func(w http.ResponseWriter, r *http.Request) {
-	//	checkContentType(r)
-	//
-	//	switch r.Method {
-	//	case http.MethodGet:
-	//		//Entity.GetUserItem(w, r, db)
-	//		break
-	//	}
-	//})
-
-	//err = http.ListenAndServe(":8080", nil)
-
-	//log.Fatal(err)
 }
