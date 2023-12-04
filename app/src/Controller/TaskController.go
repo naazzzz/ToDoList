@@ -1,7 +1,6 @@
 package Controller
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"learning-go/src/Entity"
 	"learning-go/src/Service"
@@ -21,9 +20,7 @@ func CreateObjTask(c *gin.Context) {
 
 	db := Service.CreateConnection()
 
-	err := json.NewDecoder(c.Request.Body).Decode(&task)
-
-	if err != nil {
+	if err := c.BindJSON(&task); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -90,13 +87,12 @@ func UpdateObjTask(c *gin.Context) {
 
 	objId := c.Param("id")
 
-	err := json.NewDecoder(c.Request.Body).Decode(&task)
-	if err != nil {
+	if err := c.BindJSON(&task); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = db.Where("id = ?", objId).First(&task).Updates(&task).Error
+	err := db.Where("id = ?", objId).First(&task).Updates(&task).Error
 	if err != nil {
 		http.NotFound(c.Writer, c.Request)
 		return

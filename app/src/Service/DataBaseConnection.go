@@ -17,8 +17,7 @@ func CreateConnection() *gorm.DB {
 		fmt.Errorf("db errors: %w", err)
 	}
 
-	err = db.AutoMigrate(Entity.User{})
-	err = db.AutoMigrate(Entity.Task{})
+	err = db.AutoMigrate(Entity.User{}, Entity.Task{}, Entity.AccessToken{}, Entity.Client{}, Entity.RefreshToken{})
 
 	return db
 }

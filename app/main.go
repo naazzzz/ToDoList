@@ -26,7 +26,8 @@ func init() {
 //@host localhost:8080
 //@BasePath /
 
-// @securityDefinitions.apiKey ApiKeyAuth
+// @securityDefinitions.oauth2.password oauth
+// @tokenUrl /token
 // @in header
 // @name Authorization
 func main() {
@@ -50,6 +51,8 @@ func main() {
 		tasks.GET("", Controller.GetObjCollectionTask)
 		tasks.PUT("/:id", Controller.UpdateObjTask)
 	}
+
+	router.POST("/token", Controller.TokenController)
 
 	err := router.Run()
 	if err != nil {

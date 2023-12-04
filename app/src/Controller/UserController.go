@@ -65,6 +65,7 @@ func GetObjItemUser(c *gin.Context) {
 }
 
 // GetObjCollectionUser godoc
+// @Security oauth
 // @Summary Get Object Collection User entity
 // @tags Users
 // @description Get Object Collection User entity
@@ -76,6 +77,9 @@ func GetObjCollectionUser(c *gin.Context) {
 	var tasks []Entity.Task
 
 	db := Service.CreateConnection()
+
+	Service.AuthEndpoint(c, db)
+
 	db.Model(&Entity.User{}).Find(&users)
 
 	for index, element := range users {
