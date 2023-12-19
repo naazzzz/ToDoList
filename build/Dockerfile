@@ -5,10 +5,10 @@ FROM golang:1.21.3
 WORKDIR /app
 
 # Copy everything at /app
-COPY .. /app
+COPY ../.. /app
 
 # Build the go app
-RUN go build -o main .
+RUN go build -o main ./cmd/app
 
 ## Expose port
 #EXPOSE 8080

@@ -1,10 +1,10 @@
-package Service
+package internal
 
 import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"learning-go/src/Entity"
+	model "learning-go/internal/model"
 	"os"
 )
 
@@ -17,7 +17,7 @@ func CreateConnection() *gorm.DB {
 		fmt.Errorf("db errors: %w", err)
 	}
 
-	err = db.AutoMigrate(Entity.User{}, Entity.Task{}, Entity.AccessToken{}, Entity.Client{}, Entity.RefreshToken{})
+	err = db.AutoMigrate(model.User{}, model.Task{}, model.AccessToken{}, model.Client{}, model.RefreshToken{})
 
 	return db
 }

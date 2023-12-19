@@ -1,4 +1,4 @@
-package Entity
+package internal
 
 import (
 	"time"

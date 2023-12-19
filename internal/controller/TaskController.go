@@ -1,9 +1,9 @@
-package Controller
+package internal
 
 import (
 	"github.com/gin-gonic/gin"
-	"learning-go/src/Entity"
-	"learning-go/src/Service"
+	model "learning-go/internal/model"
+	service "learning-go/internal/service"
 	"net/http"
 )
 
@@ -13,12 +13,12 @@ import (
 // @description Create a new Task entity
 // @Accept json
 // @Produce json
-// @Param input body Entity.TaskDTO true "Task info"
+// @Param input body model.TaskDTO true "Task info"
 // @Router /tasks [post]
 func CreateObjTask(c *gin.Context) {
-	var task Entity.Task
+	var task model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	if err := c.BindJSON(&task); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
@@ -39,9 +39,9 @@ func CreateObjTask(c *gin.Context) {
 // @Param id   path      int  true  "Task ID"
 // @Router /tasks/{id} [get]
 func GetObjItemTask(c *gin.Context) {
-	var task Entity.Task
+	var task model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	objId := c.Param("id")
 
@@ -62,9 +62,9 @@ func GetObjItemTask(c *gin.Context) {
 // @Produce json
 // @Router /tasks [get]
 func GetObjCollectionTask(c *gin.Context) {
-	var tasks []Entity.Task
+	var tasks []model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	db.Model(&tasks).Find(&tasks)
 
@@ -78,12 +78,12 @@ func GetObjCollectionTask(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id   path      int  true  "Task ID"
-// @Param input body Entity.TaskDTO true "Task info"
+// @Param input body model.TaskDTO true "Task info"
 // @Router /tasks/{id} [put]
 func UpdateObjTask(c *gin.Context) {
-	var task Entity.Task
+	var task model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	objId := c.Param("id")
 

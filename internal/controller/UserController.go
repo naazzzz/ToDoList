@@ -1,9 +1,9 @@
-package Controller
+package internal
 
 import (
 	"github.com/gin-gonic/gin"
-	"learning-go/src/Entity"
-	"learning-go/src/Service"
+	model "learning-go/internal/model"
+	service "learning-go/internal/service"
 	"net/http"
 )
 
@@ -13,13 +13,13 @@ import (
 // @description Create a new User entity
 // @Accept json
 // @Produce json
-// @Param input body Entity.UserDTO true "User info"
+// @Param input body model.UserDTO true "User info"
 // @Router /users [post]
 func CreateObjUser(c *gin.Context) {
-	var user Entity.User
-	var tasks []Entity.Task
+	var user model.User
+	var tasks []model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	if err := c.BindJSON(&user); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
@@ -44,10 +44,10 @@ func CreateObjUser(c *gin.Context) {
 // @Param id   path      int  true  "User ID"
 // @Router /users/{id} [get]
 func GetObjItemUser(c *gin.Context) {
-	var user Entity.User
-	var tasks []Entity.Task
+	var user model.User
+	var tasks []model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	objId := c.Param("id")
 
@@ -58,7 +58,7 @@ func GetObjItemUser(c *gin.Context) {
 		return
 	}
 
-	db.Model(Entity.Task{UserId: user.ID}).Find(&tasks)
+	db.Model(model.Task{UserId: user.ID}).Find(&tasks)
 	user.Tasks = tasks
 
 	c.JSON(200, &user)
@@ -73,17 +73,17 @@ func GetObjItemUser(c *gin.Context) {
 // @Produce json
 // @Router /users [get]
 func GetObjCollectionUser(c *gin.Context) {
-	var users []Entity.User
-	var tasks []Entity.Task
+	var users []model.User
+	var tasks []model.Task
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
-	Service.AuthEndpoint(c, db)
+	service.AuthEndpoint(c, db)
 
-	db.Model(&Entity.User{}).Find(&users)
+	db.Model(&model.User{}).Find(&users)
 
 	for index, element := range users {
-		db.Model(Entity.Task{}).Where("user_id = ?", element.ID).Find(&tasks)
+		db.Model(model.Task{}).Where("user_id = ?", element.ID).Find(&tasks)
 		users[index].Tasks = tasks
 	}
 
@@ -97,12 +97,12 @@ func GetObjCollectionUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id   path      int  true  "User ID"
-// @Param input body Entity.UserDTO true "User info"
+// @Param input body model.UserDTO true "User info"
 // @Router /users/{id} [put]
 func UpdateObjUser(c *gin.Context) {
-	var user Entity.User
+	var user model.User
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	objId := c.Param("id")
 
@@ -111,7 +111,7 @@ func UpdateObjUser(c *gin.Context) {
 		return
 	}
 
-	err := db.Where("id = ?", objId).Updates(&Entity.User{Username: user.Username, Password: user.Password}).Error
+	err := db.Where("id = ?", objId).Updates(&model.User{Username: user.Username, Password: user.Password}).Error
 
 	if err != nil {
 		http.NotFound(c.Writer, c.Request)

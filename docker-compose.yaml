@@ -17,10 +17,10 @@ services:
 
   go:
     build:
-      dockerfile: Dockerfile
+      dockerfile: build/Dockerfile
 
     ports:
-      - 9990:9990
+      - 8080:8080
 
 volumes:
   db_app:

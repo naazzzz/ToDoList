@@ -1,12 +1,12 @@
-package Controller
+package internal
 
 import (
 	"encoding/base64"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"learning-go/src/Entity"
-	"learning-go/src/Service"
+	model "learning-go/internal/model"
+	service "learning-go/internal/service"
 	"log"
 	"net/http"
 	"net/url"
@@ -39,13 +39,13 @@ const (
 )
 
 func TokenController(c *gin.Context) {
-	var client Entity.Client
-	var access Entity.AccessToken
-	var refresh Entity.RefreshToken
+	var client model.Client
+	var access model.AccessToken
+	var refresh model.RefreshToken
 	var request Request
-	var user Entity.User
+	var user model.User
 
-	db := Service.CreateConnection()
+	db := service.CreateConnection()
 
 	requestData, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
@@ -62,7 +62,7 @@ func TokenController(c *gin.Context) {
 		http.Error(c.Writer, "unsupported grant type", http.StatusBadRequest)
 	}
 
-	err = db.Model(&Entity.User{Username: request.Username, Password: request.Password}).First(&user).Error
+	err = db.Model(&model.User{Username: request.Username, Password: request.Password}).First(&user).Error
 
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusForbidden)
@@ -83,7 +83,7 @@ func TokenController(c *gin.Context) {
 	clientId := clientCred[0]
 	clientSecret := clientCred[1]
 
-	err = db.Model(&Entity.Client{
+	err = db.Model(&model.Client{
 		Identifier: clientId,
 		Secret:     clientSecret,
 	}).First(&client).Error
