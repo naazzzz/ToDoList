@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	model "learning-go/internal/model"
 	service "learning-go/internal/service"
 	"net/http"
@@ -18,15 +19,19 @@ import (
 func CreateObjUser(c *gin.Context) {
 	var user model.User
 	var tasks []model.Task
+	var db = &gorm.DB{}
+	var closeDB = func() {}
 
-	db := service.CreateConnection()
+	db = service.CreateConnection()
 
 	if err := c.BindJSON(&user); err != nil {
+		closeDB()
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if err := db.Create(&user); err.Error != nil {
+		closeDB()
 		http.Error(c.Writer, err.Error.Error(), http.StatusBadRequest)
 		return
 	}

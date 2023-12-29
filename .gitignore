@@ -18971,3 +18971,4 @@
 /service/mod/gorm.io/gorm@v1.25.5/statement.go
 /service/mod/gorm.io/gorm@v1.25.5/statement_test.go
 /service/sumdb/sum.golang.org/latest
+/.idea

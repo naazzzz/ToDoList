@@ -11,6 +11,7 @@ import (
 func CreateConnection() *gorm.DB {
 	path, _ := os.LookupEnv("DATABASE_URL")
 
+	fmt.Println(path)
 	db, err := gorm.Open(mysql.Open(path), &gorm.Config{})
 
 	if err != nil {

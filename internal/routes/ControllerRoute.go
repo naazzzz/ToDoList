@@ -5,10 +5,24 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	controller "learning-go/internal/controller"
+	"os"
 )
 
-func Route() {
-	router := gin.New()
+func Route() *gin.Engine {
+	//router := gin.New()
+
+	switch os.Getenv("APP_ENV_MODE") {
+	case "debug":
+		gin.SetMode(gin.DebugMode)
+	case "test":
+		gin.SetMode(gin.TestMode)
+	case "prod":
+		gin.SetMode(gin.ReleaseMode)
+	default:
+		gin.SetMode(gin.DebugMode)
+	}
+
+	router := gin.Default()
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -30,8 +44,5 @@ func Route() {
 
 	router.POST("/token", controller.TokenController)
 
-	err := router.Run()
-	if err != nil {
-		return
-	}
+	return router
 }

@@ -28,6 +28,11 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+	e := routes.Route()
 
-	routes.Route()
+	err := e.Run(":8080")
+	if err != nil {
+		panic(err)
+	}
+
 }
